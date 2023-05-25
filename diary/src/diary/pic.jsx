@@ -5,9 +5,12 @@ function Pic() {
   const navigate = useNavigate();
   const [uploadedImage, setUploadedImage] = useState(null);
   const [text, setText] = useState("");
+  const [textPosition, setTextPosition] = useState({ x: 20, y: 50 });
   const canvasRef = useRef(null);
   const canvasWidth = 500;
   const canvasHeight = 400;
+  const isDragging = useRef(false);
+  const prevMousePosition = useRef({ x: 0, y: 0 });
 
   const handleTitleClick = () => {
     navigate("/");
@@ -26,12 +29,45 @@ function Pic() {
 
   const handleSaveImage = () => {
     if (uploadedImage) {
-      console.log("Image saved:", uploadedImage);
+      const canvas = canvasRef.current;
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/jpeg");
+      link.download = "edited_image.jpg";
+      link.click();
     }
   };
 
   const handleTextChange = (event) => {
     setText(event.target.value);
+  };
+
+  const handleMouseDown = (event) => {
+    isDragging.current = true;
+    prevMousePosition.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+  };
+
+  const handleMouseMove = (event) => {
+    if (isDragging.current) {
+      const deltaX = event.clientX - prevMousePosition.current.x;
+      const deltaY = event.clientY - prevMousePosition.current.y;
+
+      setTextPosition((prevPosition) => ({
+        x: prevPosition.x + deltaX,
+        y: prevPosition.y + deltaY,
+      }));
+
+      prevMousePosition.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
   };
 
   useEffect(() => {
@@ -45,14 +81,14 @@ function Pic() {
         context.clearRect(0, 0, canvasWidth, canvasHeight);
         context.drawImage(image, 0, 0, canvasWidth, canvasHeight);
         context.font = "30px Arial";
-        context.fillText(text, 20, 50);
+        context.fillText(text, textPosition.x, textPosition.y);
       };
     };
 
     if (uploadedImage) {
       loadImage();
     }
-  }, [uploadedImage, text, canvasWidth, canvasHeight]);
+  }, [uploadedImage, text, textPosition, canvasWidth, canvasHeight]);
 
   return (
     <div
@@ -79,6 +115,9 @@ function Pic() {
         width={canvasWidth}
         height={canvasHeight}
         style={{ border: "1px solid black", marginTop: 20 }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
       />
 
       <input type="file" accept="image/*" onChange={handleImageUpload} />
@@ -90,7 +129,7 @@ function Pic() {
         style={{ marginTop: 20, width: 300, height: 100 }}
       />
 
-      <button onClick={handleSaveImage}>Save</button>
+      <button onClick={handleSaveImage}>저장</button>
     </div>
   );
 }
