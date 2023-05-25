@@ -126,7 +126,7 @@ function Pic() {
         value={text}
         onChange={handleTextChange}
         placeholder="Enter text..."
-        style={{ marginTop: 20, width: 300, height: 100 }}
+        style={{ marginTop: 20, width: 300, height: 50 }}
       />
 
       <button onClick={handleSaveImage}>저장</button>
