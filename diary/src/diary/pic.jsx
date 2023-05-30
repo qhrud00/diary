@@ -90,6 +90,12 @@ function Pic() {
     }
   }, [uploadedImage, text, textPosition, canvasWidth, canvasHeight]);
 
+  const handleUploadToMain = () => {
+    if (uploadedImage) {
+      navigate("/main", { state: { editedImage: uploadedImage } });
+    }
+  };
+
   return (
     <div
       style={{
@@ -129,7 +135,8 @@ function Pic() {
         style={{ marginTop: 20, width: 300, height: 50 }}
       />
 
-      <button onClick={handleSaveImage}>저장</button>
+      <button onClick={handleSaveImage}>Save</button>
+      <button onClick={handleUploadToMain}>Upload to Main</button>
     </div>
   );
 }
